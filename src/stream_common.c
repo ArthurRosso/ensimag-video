@@ -51,35 +51,33 @@ struct streamstate *getStreamState(ogg_sync_state *pstate, ogg_page *ppage,
 
     struct streamstate *s= NULL;
     if (bos) { // début de stream
-	s = malloc(sizeof(struct streamstate));
-	s->serial = serial;
-	s->nbpacket = 0;
-	s->nbpacketoutsync = 0;
-	s->strtype = TYPE_UNKNOW;
-	s->headersRead = false;
-	int res = ogg_stream_init( & s->strstate, serial );
-	th_info_init(& s->th_dec.info);
-	th_comment_init(& s->th_dec.comment);
-	vorbis_info_init( & s->vo_dec.info);
-	vorbis_comment_init( & s->vo_dec.comment);
-	assert(res == 0);
+		s = malloc(sizeof(struct streamstate));
+		s->serial = serial;
+		s->nbpacket = 0;
+		s->nbpacketoutsync = 0;
+		s->strtype = TYPE_UNKNOW;
+		s->headersRead = false;
+		int res = ogg_stream_init( & s->strstate, serial );
+		th_info_init(& s->th_dec.info);
+		th_comment_init(& s->th_dec.comment);
+		vorbis_info_init( & s->vo_dec.info);
+		vorbis_comment_init( & s->vo_dec.comment);
+		assert(res == 0);
 
-	// proteger l'accès à la hashmap
-
-	if (type == TYPE_THEORA)
-	    HASH_ADD_INT( theorastrstate, serial, s );
-	else
-	    HASH_ADD_INT( vorbisstrstate, serial, s );
-
+		// proteger l'accès à la hashmap
+		if (type == TYPE_THEORA){
+			HASH_ADD_INT( theorastrstate, serial, s );
+		}else{
+			HASH_ADD_INT( vorbisstrstate, serial, s );
+		}
     } else {
-	// proteger l'accès à la hashmap
-
-	if (type == TYPE_THEORA)
-	    HASH_FIND_INT( theorastrstate, & serial, s );
-	else	
-	    HASH_FIND_INT( vorbisstrstate, & serial, s );    
-
-	assert(s != NULL);
+		// proteger l'accès à la hashmap
+		if (type == TYPE_THEORA){
+			HASH_FIND_INT( theorastrstate, & serial, s );
+		}else{	
+			HASH_FIND_INT( vorbisstrstate, & serial, s );    
+		}
+		assert(s != NULL);
     }
     assert(s != NULL);
 
@@ -130,7 +128,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 		return 1;
 	    }
 
-            // premier packet de données theora
+		// premier packet de données theora
 	    // allocation du contexte
 	    s->th_dec.ctx = th_decode_alloc(& s->th_dec.info,
 					    s->th_dec.setup);
@@ -139,8 +137,15 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 	    s->headersRead = true;
 
 	    if (type == TYPE_THEORA) {
-		// lancement du thread gérant l'affichage (draw2SDL)
+			// lancement du thread gérant l'affichage (draw2SDL)
 	        // inserer votre code ici !!
+
+			// Vous devez aussi lancer le thread gérant l'affichage en exécutant la fonc-
+			// tion draw2SDL. Le lancement a lieu vers la ligne 144 du fichier
+			// stream_common.c dans la fonction decodeAllHeaders. Il prend en argument
+			// le numéro du flux vidéo (s->serial).
+			pthread_t thread_draw2SDL;
+			pthread_create(&thread_draw2SDL, NULL, draw2SDL, (void *)s->serial);
 
 		assert(res == 0);		     
 	    }
