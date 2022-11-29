@@ -53,17 +53,17 @@ void *draw2SDL(void *arg) {
     assert(texture);
     // remplir les planes de TextureDate
     for(int i=0; i < NBTEX; i++) {
-	texturedate[i].plane[0] = malloc( windowsx * windowsy );
-	texturedate[i].plane[1] = malloc( windowsx * windowsy );
-	texturedate[i].plane[2] = malloc( windowsx * windowsy );
+		texturedate[i].plane[0] = malloc( windowsx * windowsy );
+		texturedate[i].plane[1] = malloc( windowsx * windowsy );
+		texturedate[i].plane[2] = malloc( windowsx * windowsy );
     }
     
     signalerFenetreEtTexturePrete();
 
     /* Protéger l'accès à la hashmap */
-
+	pthread_mutex_lock(&mutex);
     HASH_FIND_INT( theorastrstate, &serial, s );
-
+	pthread_mutex_unlock(&mutex);
 
 
     assert(s->strtype == TYPE_THEORA);
