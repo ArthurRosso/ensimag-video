@@ -4,8 +4,9 @@
 #include "ensivideo.h"
 
 extern bool fini;
-extern pthread_t theora2sdlthread;
 extern struct timespec datedebut;
+extern pthread_t theora2sdlthread;
+extern pthread_mutex_t mutex_hashmap;
 
 int msFromStart();
 void pageReader(FILE *vf, ogg_sync_state *pstate, ogg_page *ppage);

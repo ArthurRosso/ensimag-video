@@ -58,6 +58,8 @@ add_test(CommonPthreadError perl ${CMAKE_SOURCE_DIR}/tests/pthcocci.pl)
 ##
 add_custom_target(check ctest -V)
 
+add_compile_options(-pthread)
+
 
 ##
 # Construction de l'archive

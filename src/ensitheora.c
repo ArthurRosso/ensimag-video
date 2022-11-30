@@ -17,6 +17,8 @@ static SDL_Renderer *renderer = NULL;
 struct TextureDate texturedate[NBTEX] = {}; 
 SDL_Rect rect = {};
 
+pthread_mutex_t mutex_hashmap;
+
 struct streamstate *theorastrstate=NULL;
 
 void *draw2SDL(void *arg) {

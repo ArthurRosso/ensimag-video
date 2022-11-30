@@ -7,7 +7,6 @@
 
 bool fini = false;
 
-
 struct timespec datedebut;
 
 int msFromStart() {
@@ -148,8 +147,7 @@ int decodeAllHeaders(int respac, struct streamstate *s, enum streamtype type) {
 			// tion draw2SDL. Le lancement a lieu vers la ligne 144 du fichier
 			// stream_common.c dans la fonction decodeAllHeaders. Il prend en argument
 			// le numéro du flux vidéo (s->serial).
-			pthread_t thread_draw2SDL;
-			pthread_create(&thread_draw2SDL, NULL, draw2SDL, (void *)s->serial);
+			pthread_create(&theora2sdlthread, NULL, draw2SDL, (void *)(long int)s->serial);
 
 		assert(res == 0);		     
 	    }

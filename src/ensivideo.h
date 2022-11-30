@@ -8,6 +8,9 @@
 #include <vorbis/codec.h>
 #include "uthash.h"
 
+extern pthread_t theora2sdlthread;
+extern pthread_mutex_t mutex_hashmap;
+
 enum streamtype { TYPE_UNKNOW, TYPE_THEORA, TYPE_VORBIS };
 
 struct theora_decode {

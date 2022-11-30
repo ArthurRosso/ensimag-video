@@ -5,7 +5,6 @@
 extern bool fini;
 
 /* les variables pour la synchro, ici */
-extern pthread_mutex_t mutex_hashmap;
 
 pthread_mutex_t mutex_taille;
 pthread_cond_t cond_taille;
@@ -14,6 +13,11 @@ bool est_taille_pret;
 pthread_mutex_t mutex_texture;
 pthread_cond_t cond_texture;
 bool est_texture_pret;
+
+pthread_mutex_t mutex_fenetre;
+pthread_cond_t cond_vide;
+pthread_cond_t cond_plein;
+int nb_textures;
 
 /* l'implantation des fonctions de synchro ici */
 
@@ -70,14 +74,33 @@ void attendreFenetreTexture() {
 }
 
 void debutConsommerTexture() {
+    pthread_mutex_lock(&mutex_fenetre);
+    while(nb_textures == 0){
+        pthread_cond_wait(&cond_vide, &mutex_fenetre);
+    }
+    pthread_mutex_unlock(&mutex_fenetre);
 }
 
 void finConsommerTexture() {
+    pthread_mutex_lock(&mutex_fenetre);
+    nb_textures--;
+    pthread_cond_signal(&cond_plein);
+    signalerFenetreEtTexturePrete();
+    pthread_mutex_unlock(&mutex_fenetre);
 }
 
 
 void debutDeposerTexture() {
+    pthread_mutex_lock(&mutex_fenetre);
+    while(nb_textures == NBTEX){
+        pthread_cond_wait(&cond_plein, &mutex_fenetre);
+    }
+    pthread_mutex_unlock(&mutex_fenetre);
 }
 
 void finDeposerTexture() {
+    pthread_mutex_lock(&mutex_fenetre);
+    nb_textures++;
+    pthread_cond_signal(&cond_vide);
+    pthread_mutex_unlock(&mutex_fenetre);
 }

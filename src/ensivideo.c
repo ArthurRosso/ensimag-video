@@ -5,8 +5,9 @@
 
 #include "stream_common.h"
 #include "oggstream.h"
+#include "synchro.h"
 
-# include <pthread.h>
+pthread_t theora2sdlthread;
 
 int main(int argc, char *argv[]) {
     int res;
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     pthread_join(thread_vorbis, &status);
     if(status != ALL_IS_OK){
-        printf("Thread % lx not ok \n", thread_vorbis); 
+        printf("Thread %lx not ok \n", thread_vorbis); 
     }
 
     // 1 seconde de garde pour le son,
@@ -52,11 +53,11 @@ int main(int argc, char *argv[]) {
 
     // tuer les deux threads videos si ils sont bloqués
     pthread_cancel(thread_theora);
-    pthread_cancel(thread_vorbis);
+    pthread_cancel(theora2sdlthread);
 
     // attendre les 2 threads videos
     pthread_join(thread_theora,NULL);
-    pthread_join(thread_vorbis,NULL);
+    pthread_join(theora2sdlthread,NULL);
 
     
     exit(EXIT_SUCCESS);    
